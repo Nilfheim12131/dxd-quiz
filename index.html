@@ -79,6 +79,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
 .fillin:focus{border-color:var(--red)}
 .fillin.ok{border-color:var(--ok);background:var(--okbg)}
 .fillin.bad{border-color:var(--bad);background:var(--badbg)}
+textarea.fillin{min-height:132px;line-height:1.8;resize:vertical;overflow:hidden;font-size:16px}
+.ansbox{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:10px;padding:10px 12px;margin-top:7px;line-height:1.85;font-size:14.5px;color:#1f2329}
+.fb u{color:#b91c1c;font-weight:700;text-decoration:none}
 .hintbox{background:#fff9ec;color:#8a5a00;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.65;margin-bottom:12px}
 .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}
 .gnum{aspect-ratio:1/1;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-size:14px;color:#4b5563;display:flex;align-items:center;justify-content:center;font-weight:600}
@@ -256,15 +259,36 @@ function toast(msg){
 
 /* ============ 题库 ============ */
 var raw=JSON.parse(document.getElementById('quiz-data').textContent);
-var TN={single:'单选题',multi:'多选题',judge:'判断题',fill:'填空题'};
+var TN={single:'单选题',multi:'多选题',judge:'判断题',fill:'填空题',short:'简答题'};
+/* 长答案题目的要点（用于默写后自动比对，按要点给分） */
+var KEYS={
+  F12:['为中国人民谋幸福','为中华民族谋复兴'],
+  F14:['立党为公','为民造福','科学决策','真抓实干'],
+  F18:['一切从实际出发','理论联系实际','实事求是','检验真理'],
+  F19:['一切为了群众','一切依靠群众','从群众中来','到群众中去'],
+  F20:['警告','严重警告','撤销党内职务','留党察看','开除党籍'],
+  F21:['表决权','选举权','被选举权'],
+  F24:['政治意识','大局意识','核心意识','看齐意识'],
+  F25:['道路自信','理论自信','制度自信','文化自信'],
+  F26:['习近平总书记','核心地位','党中央权威','集中统一领导'],
+  F28:['控制总量','优化结构','提高质量','发挥作用'],
+  F29:['十五五','规划','建议'],
+  Q1:['工人阶级的先锋队','中国人民和中华民族的先锋队','领导核心','先进生产力','先进文化','最广大人民的根本利益'],
+  Q2:['拥护党的纲领','遵守党的章程','履行党员义务','执行党的决定','严守党的纪律','保守党的秘密','对党忠诚','积极工作','为共产主义奋斗终身','永不叛党'],
+  Q3:['马克思列宁主义','毛泽东思想','邓小平理论','三个代表','科学发展观','习近平新时代中国特色社会主义思想'],
+  Q4:['中国特色社会主义伟大旗帜','习近平新时代中国特色社会主义思想','伟大建党精神','自信自强','守正创新','踔厉奋发','勇毅前行','社会主义现代化国家','中华民族伟大复兴'],
+  Q5:['十四五','十五五','中国式现代化','五年规划的建议','新质生产力','现代化产业体系','新发展格局','高水平对外开放']
+};
 function sortNum(a,b){return a-b;}
 var banks={
   single:raw.single.map(function(x,i){return {id:'S'+(i+1),type:'single',stem:x.s,opts:x.o,ans:x.a.slice().sort(sortNum),note:x.n||''};}),
   multi:raw.multi.map(function(x,i){return {id:'M'+(i+1),type:'multi',stem:x.s,opts:x.o,ans:x.a.slice().sort(sortNum),note:x.n||''};}),
   judge:raw.judge.map(function(x,i){return {id:'J'+(i+1),type:'judge',stem:x.s,opts:['正确','错误'],ans:[x.a?0:1],note:x.n||''};}),
-  fill:raw.fill.map(function(x,i){return {id:'F'+(i+1),type:'fill',stem:x.s,ans:x.a,full:x.f||x.s.replace('____',x.a[0]),long:!!x.long};})
+  fill:raw.fill.map(function(x,i){return {id:'F'+(i+1),type:'fill',stem:x.s,ans:x.a,full:x.f||x.s.replace('____',x.a[0]),long:!!x.long,keys:KEYS['F'+(i+1)]||[]};}),
+  short:raw.short.map(function(x,i){return {id:'Q'+(i+1),type:'short',stem:x.s,ans:[x.a],keys:KEYS['Q'+(i+1)]||[],long:true};})
 };
-var TYPES=['single','multi','judge','fill'];
+var TYPES=['single','multi','judge','fill','short'];
+var EXAM_TYPES=['single','multi','judge'];
 var ALL={};
 TYPES.forEach(function(t){banks[t].forEach(function(q){ALL[q.id]=q;});});
 var TOTAL=TYPES.reduce(function(n,t){return n+banks[t].length;},0);
@@ -275,10 +299,12 @@ var PRESETS={
 };
 
 function ansText(q){
-  if(q.type==='fill')return q.ans[0];
+  if(q.type==='fill'||q.type==='short')return q.ans[0];
   if(q.type==='judge')return q.ans[0]===0?'正确（√）':'错误（×）';
   return q.ans.map(function(i){return LT[i];}).join('');
 }
+function usesKeys(q){return q.type==='short'||(q.type==='fill'&&q.long);}
+function ansLabelName(q){return usesKeys(q)?'参考答案':'正确答案';}
 function labelOf(q,i){return q.type==='judge'?(i===0?'正确':'错误'):LT[i];}
 function pickedText(q,picked){
   if(!picked||!picked.length)return '';
@@ -303,6 +329,12 @@ function fillOk(q,input){
     return false;
   });
 }
+/* 默写作答：统计写到 / 漏掉的要点，命中 60% 以上算答对 */
+function keyHits(q,input){
+  var v=norm(input),keys=q.keys||[],hits=[],missed=[];
+  keys.forEach(function(k){if(v.indexOf(norm(k))>=0)hits.push(k);else missed.push(k);});
+  return {hits:hits,missed:missed,ratio:keys.length?hits.length/keys.length:0};
+}
 
 /* ============ 本地记录 ============ */
 var KEY='dxd_quiz_v1';
@@ -325,6 +357,12 @@ function record(q,ok){
   else addWrong(q.id);
   persist();
 }
+function unrecord(q,ok){
+  if(store.stats.done>0)store.stats.done--;
+  if(ok){if(store.stats.right>0)store.stats.right--;}
+  else delWrong(q.id);
+  persist();
+}
 
 /* ============ 界面状态 ============ */
 var ui={
@@ -343,17 +381,17 @@ function viewHome(){
   +'<div class="wrap nobar">'
   +'<div class="card hero">'
   +'<div class="t">题库已就绪 · 共 '+TOTAL+' 题</div>'
-  +'<div class="s">'+counts+' · 简答题 '+raw.short.length+' 题</div>'
+  +'<div class="s">'+counts+'</div>'
   +'<div class="st">本机累计练习 <b>'+st.done+'</b> 题 · 正确率 <b>'+rate+'%</b>'+(store.history.length?' · 已考 '+store.history.length+' 次':'')+'</div>'
   +'</div>'
-  +'<button class="mode" data-act="go" data-v="practice"><span class="mi">✍️</span><span class="mt">练习模式<em>逐题作答，答完立刻看正确答案和解析</em></span><span class="arrow">›</span></button>'
-  +'<button class="mode" data-act="go" data-v="exam"><span class="mi">⏱️</span><span class="mt">考试模式<em>限时答题、交卷自动评分，可看逐题解析</em></span><span class="arrow">›</span></button>'
+  +'<button class="mode" data-act="go" data-v="practice"><span class="mi">✍️</span><span class="mt">练习模式<em>选择题点选作答，填空和简答可以打字默写，提交后立即对照答案</em></span><span class="arrow">›</span></button>'
+  +'<button class="mode" data-act="go" data-v="exam"><span class="mi">⏱️</span><span class="mt">考试模式<em>从 90 道客观题随机抽题、限时作答、交卷自动评分</em></span><span class="arrow">›</span></button>'
   +'<button class="mode" data-act="go" data-v="recite"><span class="mi">📖</span><span class="mt">速记背诵<em>填空题原文＋简答题答案，考前一遍过</em></span><span class="arrow">›</span></button>'
   +'<div class="row2">'
   +'<button class="btn ghost" data-act="go" data-v="wrong">错题本（'+nw+'）</button>'
   +'<button class="btn ghost" data-act="reset">清除记录</button>'
   +'</div>'
-  +'<p class="tip">题库来源：《发展对象考试复习提纲（下发版）》，共 '+TOTAL+' 道客观题。单选题第 17 题答案已由 C 改为 D。<br>把本页面收藏到手机桌面，随时可以刷题。</p>'
+  +'<p class="tip">题库来源：《发展对象考试复习提纲（下发版）》，共 '+TOTAL+' 道题。单选题第 17 题答案已由 C 改为 D。<br>把本页面收藏到手机桌面，随时可以刷题。</p>'
   +'</div>';
 }
 
@@ -373,13 +411,13 @@ function viewPracticeSetup(){
   +'</div>'
   +'<button class="btn primary block" data-act="pstart">开始练习</button>'
   +'<button class="btn ghost block" data-act="prestartwrong"'+(nw?'':' disabled')+'>只练错题（'+nw+' 题）</button>'
-  +'<p class="tip">单选题点击选项即判分；多选题选好后点“确定作答”；填空题输入关键词即可，答不出可点“显示答案”。</p>'
+  +'<p class="tip">单选题点击选项即判分；多选题选好后点“确定作答”；填空题和简答题可以照着题目打字默写，提交后自动比对要点并给出参考答案，判得不准还能自己改判。</p>'
   +'</div>';
 }
 
 function pst(q){
   var p=ui.p;
-  if(!p.st[q.id])p.st[q.id]={picked:[],graded:false,correct:false,revealed:false,self:null,inputRaw:''};
+  if(!p.st[q.id])p.st[q.id]={picked:[],graded:false,correct:false,revealed:false,inputRaw:'',hits:null,missed:null,auto:false};
   return p.st[q.id];
 }
 function optsHtml(q,st){
@@ -398,32 +436,39 @@ function fbBox(q,st){
   var ok=!!(st.graded&&st.correct);
   var cls=st.graded?(ok?'ok':'bad'):'info';
   var title=st.graded?(ok?'✅ 答对了':'❌ 答错了'):'💡 答案提示';
-  var rows='<div class="fr">正确答案：<b>'+esc(ansText(q))+'</b></div>';
-  if(st.graded){
-    if(q.type==='fill'&&st.inputRaw)rows+='<div class="fr">你的答案：'+esc(st.inputRaw)+'</div>';
-    if(q.type!=='fill'&&st.picked.length)rows+='<div class="fr">你的答案：'+esc(pickedText(q,st.picked))+'</div>';
+  var isWrite=(q.type==='fill'||q.type==='short');
+  var rows='';
+  if(st.graded&&usesKeys(q)&&st.hits){
+    rows+='<div class="fr">要点命中：<b>'+st.hits.length+' / '+q.keys.length+'</b></div>';
+    if(st.hits.length)rows+='<div class="fr">写到的要点：'+esc(st.hits.join('、'))+'</div>';
+    if(st.missed&&st.missed.length)rows+='<div class="fr">漏掉的要点：<u>'+esc(st.missed.join('、'))+'</u></div>';
   }
+  if(st.graded&&isWrite&&st.inputRaw)rows+='<div class="fr">你写的：'+esc(st.inputRaw)+'</div>';
+  if(st.graded&&!isWrite&&st.picked.length)rows+='<div class="fr">你的答案：'+esc(pickedText(q,st.picked))+'</div>';
+  if(usesKeys(q))rows+='<div class="fr">'+ansLabelName(q)+'：<div class="ansbox">'+esc(ansText(q))+'</div></div>';
+  else rows+='<div class="fr">'+ansLabelName(q)+'：<b>'+esc(ansText(q))+'</b></div>';
   if(q.note)rows+='<div class="fr">解析：'+esc(q.note)+'</div>';
-  if(q.type==='fill'&&q.full&&!ok&&q.full!==q.stem)rows+='<div class="fr">原句：'+esc(q.full)+'</div>';
+  if(q.type==='fill'&&!usesKeys(q)&&!ok&&q.full&&q.full!==q.stem)rows+='<div class="fr">原句：'+esc(q.full)+'</div>';
+  if(st.graded&&st.auto)rows+='<div class="fr"><button class="xbtn" data-act="flip">判得不准？改为“'+(st.correct?'答错':'答对')+'”</button></div>';
   return '<div class="fb '+cls+'"><div class="ft">'+title+'</div>'+rows+'</div>';
 }
 function viewPractice(){
   var p=ui.p,q=p.list[p.i],st=pst(q);
   var pct=Math.round((p.i+1)/p.list.length*100);
   var show=st.graded||st.revealed;
+  var myText=st.graded?(st.inputRaw||''):(st.draft||'');
   var mid='';
-  if(q.type==='fill'){
-    if(q.long){
-      mid='<div class="hintbox">答案较长，先在脑中回忆，再点“显示答案”对照自评。</div>';
-      if(show){
-        mid+=fbBox(q,st);
-        if(st.self===null)mid+='<div class="row2"><button class="btn ghost sm" data-act="pself" data-v="0">没记住</button><button class="btn primary sm" data-act="pself" data-v="1">记住了</button></div>';
-      }
+  if(q.type==='fill'||q.type==='short'){
+    var gradeStyle=st.graded?(st.correct?'ok':'bad'):'';
+    if(usesKeys(q)){
+      var ph=q.type==='short'?'照着题目默写，能写多少写多少':'写出要点即可，不必和原文一字不差';
+      mid='<textarea class="fillin area '+gradeStyle+'" id="taIn" placeholder="'+ph+'"'+(st.graded?' readonly':'')+' autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">'+esc(myText)+'</textarea>'
+      +'<div class="hintbox">按要点给分：写到 6 成要点就算答对，写错可以自己改判。</div>';
     }else{
-      mid='<input class="fillin '+(st.graded?(st.correct?'ok':'bad'):'')+'" id="fillIn" type="text" placeholder="输入答案后点“提交”" value="'+esc(p.input||'')+'"'+(show?' readonly':'')+' autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">';
-      if(show)mid+=fbBox(q,st);
-      else mid+='<div class="row2" style="margin-top:12px"><button class="btn ghost sm" data-act="fhint">提示</button><button class="btn primary sm" data-act="fsubmit">提交答案</button></div>';
+      mid='<input class="fillin '+gradeStyle+'" id="fillIn" type="text" placeholder="输入答案后点“提交”" value="'+esc(myText)+'"'+(st.graded?' readonly':'')+' autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">';
     }
+    if(show)mid+=fbBox(q,st);
+    else mid+='<div class="row2" style="margin-top:12px"><button class="btn ghost sm" data-act="fhint">提示</button><button class="btn primary sm" data-act="fsubmit">提交答案</button></div>';
   }else{
     mid=optsHtml(q,st);
     if(show)mid+=fbBox(q,st);
@@ -476,13 +521,13 @@ function viewExamSetup(){
   +'<div class="card"><div class="lbl">选择试卷</div>'+cards+'</div>'
   +(last?'<div class="card"><div class="lbl">上次成绩</div><div class="kv"><span>得分</span><b>'+last.score+' 分（答对 '+last.right+'/'+last.total+'）</b></div><div class="kv"><span>用时</span><b>'+fmtDur(last.used)+'</b></div></div>':'')
   +'<button class="btn primary block" data-act="estart">开始考试</button>'
-  +'<p class="tip">考试中不显示答案，可以来回改题。多选题必须全部选对才得分，交卷后自动评分并给出逐题解析。</p>'
+  +'<p class="tip">考试中不显示答案，可以来回改题。多选题必须全部选对才得分，交卷后自动评分并给出逐题解析。填空题、简答题在练习模式里默写。</p>'
   +'</div>';
 }
 
 function buildExam(preset){
   var cfg=PRESETS[preset].c,list=[];
-  ['single','multi','judge'].forEach(function(t){
+  EXAM_TYPES.forEach(function(t){
     list=list.concat(shuffle(banks[t]).slice(0,cfg[t]));
   });
   return list;
@@ -536,7 +581,7 @@ function viewResult(){
     return '<div class="rev">'
     +'<div class="stem">'+(idx+1)+'. '+esc(q.stem)+' <span class="tag g">'+TN[q.type]+'</span></div>'
     +'<div class="line">你的答案：'+(x.ok?'<b>'+esc(my)+'</b>':'<u>'+esc(my||'未作答')+'</u>')+'</div>'
-    +'<div class="line">正确答案：<b>'+esc(ansText(q))+'</b></div>'
+    +'<div class="line">'+ansLabelName(q)+'：<b>'+esc(ansText(q))+'</b></div>'
     +(q.note?'<div class="note">解析：'+esc(q.note)+'</div>':'')
     +'</div>';
   }).join('');
@@ -582,10 +627,10 @@ function viewWrong(){
   var body=ids.map(function(id){
     var q=ALL[id];
     return '<div class="rev" style="'+(q.type==='fill'?'':'')+'">'
-    +'<div class="stem" data-act="wopen" data-id="'+id+'"><span class="tag g">'+TN[q.type]+'</span> '+esc(q.stem)+'</div>'
-    +'<div class="line">正确答案：<b>'+esc(ansText(q))+'</b></div>'
+    +'<div class="stem"><span class="tag g">'+TN[q.type]+'</span> '+esc(q.stem)+'</div>'
+    +'<div class="line">'+ansLabelName(q)+'：'+(usesKeys(q)?'<div class="ansbox">'+esc(ansText(q))+'</div>':'<b>'+esc(ansText(q))+'</b>')+'</div>'
     +(q.note?'<div class="note">解析：'+esc(q.note)+'</div>':'')
-    +(q.type==='fill'&&q.full!==q.stem?'<div class="note">原句：'+esc(q.full)+'</div>':'')
+    +(q.type==='fill'&&!usesKeys(q)&&q.full!==q.stem?'<div class="note">原句：'+esc(q.full)+'</div>':'')
     +'<div class="row2" style="margin-top:10px"><button class="xbtn" data-act="delwrong" data-id="'+id+'">移除</button></div>'
     +'</div>';
   }).join('');
@@ -611,6 +656,11 @@ function render(){
     default:html=viewHome();
   }
   app.innerHTML=html;
+  autosize();
+}
+function autosize(){
+  var t=document.getElementById('taIn');
+  if(t){t.style.height='auto';t.style.height=Math.min(t.scrollHeight,560)+'px';}
 }
 function nav(v){ui.view=v;window.scrollTo(0,0);render();}
 function top(){window.scrollTo(0,0);}
@@ -730,11 +780,20 @@ app.addEventListener('click',function(e){
     case 'fsubmit':{
       var q3=ui.p.list[ui.p.i],s3=pst(q3);
       if(s3.graded)break;
-      if(q3.type==='fill'){
-        var inp=document.getElementById('fillIn');
-        var v=inp?inp.value:'';
-        if(!norm(v)){toast('先输入答案再提交');break;}
-        s3.inputRaw=v;s3.correct=fillOk(q3,v);s3.graded=true;record(q3,s3.correct);
+      if(q3.type==='fill'||q3.type==='short'){
+        var v='';
+        if(usesKeys(q3)){var ta=document.getElementById('taIn');v=ta?ta.value:'';}
+        else{var inp=document.getElementById('fillIn');v=inp?inp.value:'';}
+        if(!norm(v)){toast('先写点内容再提交');break;}
+        s3.inputRaw=v;
+        if(usesKeys(q3)){
+          var kr=keyHits(q3,v);
+          s3.hits=kr.hits;s3.missed=kr.missed;s3.auto=true;
+          s3.correct=kr.ratio>=0.6;
+        }else{
+          s3.correct=fillOk(q3,v);
+        }
+        s3.graded=true;record(q3,s3.correct);
       }else{
         if(!s3.picked.length){toast('请先选择答案');break;}
         s3.correct=isRight(q3,s3.picked);s3.graded=true;record(q3,s3.correct);
@@ -742,15 +801,18 @@ app.addEventListener('click',function(e){
       render();break;
     }
     case 'fhint':{
-      var q4=ui.p.list[ui.p.i],a4=q4.ans[0];
-      toast('提示：共 '+norm(a4).length+' 个字，首字是「'+a4.charAt(0)+'」');
+      var q4=ui.p.list[ui.p.i];
+      if(usesKeys(q4)){toast('提示：这道题要答出 '+q4.keys.length+' 个要点');}
+      else{var a4=q4.ans[0];toast('提示：共 '+norm(a4).length+' 个字，首字是「'+a4.charAt(0)+'」');}
       break;
     }
-    case 'pself':{
+    case 'flip':{
       var q5=ui.p.list[ui.p.i],s5=pst(q5);
-      if(s5.self!==null)break;
-      s5.self=el.getAttribute('data-v')==='1';
-      s5.graded=true;s5.correct=s5.self;record(q5,s5.self);
+      if(!s5.graded)break;
+      unrecord(q5,s5.correct);
+      s5.correct=!s5.correct;s5.auto=false;
+      record(q5,s5.correct);
+      toast(s5.correct?'已改为“答对”':'已改为“答错”，并加入错题本');
       render();break;
     }
     case 'pexit':ui.p=null;nav('practice');break;
@@ -782,7 +844,16 @@ app.addEventListener('click',function(e){
   }
 });
 app.addEventListener('input',function(e){
-  if(e.target&&e.target.id==='fillIn'&&ui.p)ui.p.input=e.target.value;
+  if(!e.target||!ui.p)return;
+  var id=e.target.id;
+  if(id!=='fillIn'&&id!=='taIn')return;
+  ui.p.input=e.target.value;
+  var cur=ui.p.list[ui.p.i];
+  if(cur)pst(cur).draft=e.target.value;
+  if(id==='taIn'){
+    e.target.style.height='auto';
+    e.target.style.height=Math.min(e.target.scrollHeight,560)+'px';
+  }
 });
 app.addEventListener('keydown',function(e){
   if(e.key==='Enter'&&e.target&&e.target.id==='fillIn'){
