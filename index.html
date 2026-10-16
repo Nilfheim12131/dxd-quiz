@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#a81f1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<title>发展对象考试刷题</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:#f4f5f7}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:#1f2329;-webkit-font-smoothing:antialiased;touch-action:manipulation}
+:root{--red:#a81f1a;--red2:#cf3a2e;--ink:#1f2329;--sub:#6b7280;--line:#e6e8eb;--ok:#15803d;--okbg:#eaf6ee;--bad:#c0392b;--badbg:#fdeceb;--warn:#b45309}
+#app{max-width:680px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.hd{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,#c0392b,#8d1a15);color:#fff;padding:calc(env(safe-area-inset-top) + 12px) 14px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.hd h1{font-size:17px;margin:0;font-weight:600;flex:1;line-height:1.3}
+.hd .back{background:rgba(255,255,255,.16);border:0;color:#fff;width:34px;height:34px;border-radius:10px;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.hd .hdbtn{background:rgba(255,255,255,.18);border:0;color:#fff;font-size:13px;padding:7px 12px;border-radius:9px;flex:0 0 auto}
+.hd .hdr{font-size:13px;opacity:.9;flex:0 0 auto}
+.subbar{background:#fff;border-bottom:1px solid var(--line);padding:9px 14px;font-size:13px;color:var(--sub);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:15}
+.subbar b{color:var(--ink)}
+.wrap{padding:12px 14px 110px;flex:1}
+.wrap.nobar{padding-bottom:24px}
+.card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(16,24,40,.06);margin-bottom:12px}
+.hero{padding:18px 16px}
+.hero .t{font-size:17px;font-weight:700}
+.hero .s{font-size:13px;color:var(--sub);margin-top:6px;line-height:1.6}
+.hero .st{font-size:13px;color:var(--sub);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.hero .st b{color:var(--red);font-size:15px}
+.mode{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 16px;margin-bottom:12px;font-size:16px;color:var(--ink);box-shadow:0 1px 3px rgba(16,24,40,.05)}
+.mode:active{background:#fafafa}
+.mode .mi{font-size:22px;flex:0 0 auto}
+.mode .mt{flex:1;font-weight:600}
+.mode .mt em{display:block;font-style:normal;font-weight:400;font-size:12.5px;color:var(--sub);margin-top:4px;line-height:1.5}
+.mode .arrow{color:#c5c8cc;font-size:20px}
+.row2{display:flex;gap:12px;margin-top:4px}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);font-size:15px;padding:12px 14px;border-radius:12px;font-weight:600;flex:1;text-align:center}
+.btn:active{opacity:.75}
+.btn.primary{background:var(--red);border-color:var(--red);color:#fff}
+.btn.ghost{background:#fff;color:var(--ink)}
+.btn.block{display:block;width:100%;margin-bottom:12px}
+.btn[disabled]{opacity:.4}
+.btn.sm{padding:9px 12px;font-size:13.5px}
+.lbl{font-size:13px;color:var(--sub);margin:2px 0 9px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:16px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 13px;font-size:13.5px;color:#4b5563}
+.chip.on{border-color:var(--red);background:#fdf2f1;color:var(--red);font-weight:600}
+.switch{display:flex;align-items:center;gap:9px;font-size:14px;color:#374151;padding:4px 0}
+.switch input{width:18px;height:18px;accent-color:var(--red)}
+.tag{display:inline-block;font-size:11.5px;background:#fdf2f1;color:var(--red);border-radius:6px;padding:3px 8px;font-weight:600;vertical-align:middle}
+.tag.g{background:#eef2f6;color:#475569}
+.qhead{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.qhead .qidx{font-size:12.5px;color:var(--sub)}
+.stem{font-size:17px;line-height:1.75;font-weight:600;margin:0 0 15px}
+.opt{display:flex;gap:11px;align-items:flex-start;padding:12px 13px;border:1.5px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fff;font-size:15.5px;line-height:1.55}
+.opt:active{background:#fafafa}
+.opt .k{flex:0 0 24px;height:24px;border-radius:50%;background:#f1f2f4;color:#4b5563;font-size:13px;display:flex;align-items:center;justify-content:center;font-weight:700;margin-top:1px}
+.opt .t{flex:1}
+.opt.sel{border-color:var(--red);background:#fdf5f4}
+.opt.sel .k{background:var(--red);color:#fff}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}
+.opt.ok .k{background:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad);background:var(--badbg)}
+.opt.bad .k{background:var(--bad);color:#fff}
+.fb{border-radius:12px;padding:13px 14px;font-size:14.5px;line-height:1.7;margin-top:14px}
+.fb.ok{background:var(--okbg);color:#14532d}
+.fb.bad{background:var(--badbg);color:#7f1d1d}
+.fb.info{background:#f5f7fa;color:#374151}
+.fb .ft{font-weight:700;margin-bottom:6px;font-size:15px}
+.fb .fr{margin-top:4px}
+.fb b{word-break:break-word}
+.progress{height:5px;background:#e9ebee}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,#c0392b,#e06656);transition:width .25s}
+.barwrap{position:fixed;left:50%;transform:translateX(-50%);width:100%;max-width:680px;bottom:0;z-index:30;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:10px 14px calc(env(safe-area-inset-bottom) + 10px);display:flex;gap:10px}
+.fillin{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:16px;font-family:inherit;outline:none;background:#fff;color:var(--ink)}
+.fillin:focus{border-color:var(--red)}
+.fillin.ok{border-color:var(--ok);background:var(--okbg)}
+.fillin.bad{border-color:var(--bad);background:var(--badbg)}
+.hintbox{background:#fff9ec;color:#8a5a00;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.65;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}
+.gnum{aspect-ratio:1/1;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-size:14px;color:#4b5563;display:flex;align-items:center;justify-content:center;font-weight:600}
+.gnum.done{background:#eef2f6;color:#334155;border-color:#dbe2ea}
+.gnum.cur{border-color:var(--red);color:var(--red);background:#fdf2f1}
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheetbox{width:100%;max-width:680px;background:#fff;border-radius:18px 18px 0 0;padding:16px 16px calc(env(safe-area-inset-bottom) + 16px);max-height:80vh;overflow:auto}
+.sheetbox h3{margin:0 0 14px;font-size:16px}
+.legend{font-size:12.5px;color:var(--sub);margin-top:14px;line-height:1.8}
+.scorebox{text-align:center;padding:26px 16px}
+.scorebox .num{font-size:52px;font-weight:800;color:var(--red);line-height:1}
+.scorebox .num small{font-size:16px;font-weight:600;color:var(--sub);margin-left:4px}
+.scorebox .cap{font-size:13.5px;color:var(--sub);margin-top:10px}
+.kv{display:flex;justify-content:space-between;font-size:14px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.kv:last-child{border-bottom:0}
+.kv span{color:var(--sub)}
+.rev{border-top:1px solid var(--line);padding:14px 0}
+.rev .stem{font-size:15.5px;font-weight:600;margin-bottom:10px}
+.rev .line{font-size:14px;color:#374151;line-height:1.7}
+.rev .line b{color:var(--ok)}
+.rev .line u{color:var(--bad);text-decoration:none;font-weight:700}
+.rev .note{font-size:13.5px;color:var(--sub);background:#f7f8fa;border-radius:10px;padding:10px 12px;margin-top:9px;line-height:1.7}
+.recite{padding:15px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.8}
+.recite:last-child{border-bottom:0}
+.recite .n{color:var(--sub);font-size:13px;margin-right:6px}
+.recite b{color:var(--red)}
+.shortb{font-size:14.5px;color:#374151;line-height:1.8;background:#f7f8fa;border-radius:10px;padding:12px 13px;margin-top:10px}
+.tip{font-size:12.5px;color:var(--sub);line-height:1.8;padding:4px 2px 0}
+.pill{font-size:12.5px;color:var(--sub);background:#eef2f6;border-radius:8px;padding:6px 10px;display:inline-block}
+.wrow{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.xbtn{border:0;background:#f1f2f4;color:#6b7280;border-radius:9px;padding:7px 11px;font-size:13px;flex:0 0 auto}
+.empty{text-align:center;color:var(--sub);font-size:14px;padding:40px 10px;line-height:1.8}
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:rgba(17,24,39,.9);color:#fff;font-size:14px;padding:10px 16px;border-radius:10px;z-index:99;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script id="quiz-data" type="application/json">
+{
+  "single": [
+    {"s":"中央八项规定是（）审议通过。","o":["十八届中央纪委二次全会","党的十八大","2012年12月4日中共中央政治局会议","党的十八届三中全会"],"a":[2]},
+    {"s":"树立和践行正确政绩观，起决定性作用的是（）","o":["能力水平","党性","制度建设","理论学习"],"a":[1]},
+    {"s":"党的二十届四中全会的核心文件是（）","o":["“十五五”规划建议","国家治理现代化决定","全面深化改革决定","党的建设决定"],"a":[0]},
+    {"s":"“十五五”时期定位是基本实现社会主义现代化（）的关键时期","o":["收官决胜","夯实基础、全面发力","起步开局","攻坚突破"],"a":[1]},
+    {"s":"预备党员的（）同正式党员一样。","o":["权利","权利和义务","义务","待遇"],"a":[2],"n":"预备党员的义务同正式党员一样；权利除了没有表决权、选举权和被选举权外，同正式党员一样。"},
+    {"s":"党内（）是党的生命。","o":["监督","纪律","民主","原则"],"a":[2]},
+    {"s":"把毛泽东思想确立为党的指导思想是党的（）","o":["七大","八大","九大","十大"],"a":[0]},
+    {"s":"发展经济着力点放在（）","o":["虚拟经济","数字经济","服务业","实体经济"],"a":[3]},
+    {"s":"“为民造福是最大政绩”这一论断的根本立场是（）","o":["高质量发展","人民立场","改革创新","守牢安全底线"],"a":[1]},
+    {"s":"党的全国代表大会每（）年举行一次。","o":["二","三","四","五"],"a":[3],"n":"党章规定：党的全国代表大会每五年举行一次。"},
+    {"s":"党的最高理想和最终目标是（）","o":["实现共产主义","实现共同富裕","实现现代化","实现民族复兴"],"a":[0]},
+    {"s":"党的思想路线的核心是（）","o":["解放思想","实事求是","与时俱进","求真务实"],"a":[1]},
+    {"s":"党的根本工作路线是（）","o":["思想路线","群众路线","组织路线","政治路线"],"a":[1],"n":"群众路线是党的根本工作路线，也是党的生命线和根本工作路线。"},
+    {"s":"党员如果没有正当理由，连续（）不参加党的组织生活，或不交纳党费，或不做党所分配的工作，就被认为是自行脱党。","o":["三个月","六个月","一年","两年"],"a":[1]},
+    {"s":"预备党员的权利，除没有（）外，同正式党员一样。","o":["发言权","表决权、选举权和被选举权","建议权","批评权"],"a":[1]},
+    {"s":"对党员的纪律处分中，最轻的是（）","o":["警告","严重警告","撤销党内职务","留党察看"],"a":[0],"n":"党的纪律处分种类由轻到重：警告、严重警告、撤销党内职务、留党察看、开除党籍。"},
+    {"s":"党的全国代表大会每（）年举行一次。","o":["二","三","四","五"],"a":[3],"n":"本题答案按用户要求由 C 改为 D。党章规定：党的全国代表大会每五年举行一次。"},
+    {"s":"中国特色社会主义最本质的特征是（）","o":["共同富裕","中国共产党领导","依法治国","改革开放"],"a":[1]},
+    {"s":"“十五五”时期经济社会发展必须遵循的重大原则中，首要的是（）","o":["坚持人民至上","坚持党的全面领导","坚持高质量发展","坚持全面深化改革"],"a":[1]},
+    {"s":"中央八项规定是（）审议通过的。","o":["党的十八大","2012年12月4日中共中央政治局会议","十八届中央纪委二次全会","党的十八届三中全会"],"a":[1]}
+  ],
+  "multi": [
+    {"s":"新民主主义革命三大法宝是（）","o":["统一战线","党的建设","武装斗争","思想政治工作"],"a":[0,1,2]},
+    {"s":"党的纪律主要包括（）","o":["政治纪律","组织纪律","廉洁纪律","群众纪律、工作纪律、生活纪律"],"a":[0,1,2,3]},
+    {"s":"伟大建党精神内容是（）","o":["坚持真理、坚守理想","践行初心、担当使命","不怕牺牲、英勇斗争","对党忠诚、不负人民"],"a":[0,1,2,3]},
+    {"s":"“四风”指（）","o":["形式主义","官僚主义","利己主义","享乐主义、奢靡之风"],"a":[0,1,3]},
+    {"s":"树立和践行正确政绩观要处理好（）的辩证关系","o":["显绩","潜绩","短期政绩","GDP增速"],"a":[0,1]},
+    {"s":"党的二十届四中全会提出发展新质生产力，要统筹建设（）","o":["教育强国","科技强国","人才强国","贸易强国"],"a":[0,1,2]},
+    {"s":"“十五五”时期经济社会发展必须遵循的重大原则包括（）","o":["坚持党的全面领导","坚持人民至上","坚持高质量发展","坚持全面深化改革"],"a":[0,1,2,3]},
+    {"s":"关于预备党员转正，说法正确的有（）","o":["预备期满一年自动转正","预备期间履行党员义务、具备条件应当按期转正","转正须支部大会讨论、上级党组织批准","必须本人提出转正申请"],"a":[1,2,3]},
+    {"s":"落实中央八项规定，公务接待应当杜绝（）","o":["按标准提供餐饮","陪餐人数过多","高档烟酒","本地特色食材"],"a":[1,2]},
+    {"s":"正确政绩观要坚决反对（）","o":["形象工程","政绩工程","急功近利","“新官不理旧账”"],"a":[0,1,2,3]},
+    {"s":"党的思想路线包括（）","o":["一切从实际出发","理论联系实际","实事求是","在实践中检验真理和发展真理"],"a":[0,1,2,3]},
+    {"s":"党的群众路线基本内容包括（）","o":["一切为了群众","一切依靠群众","从群众中来","到群众中去"],"a":[0,1,2,3]},
+    {"s":"“四个意识”包括（）","o":["政治意识","大局意识","核心意识","看齐意识"],"a":[0,1,2,3]},
+    {"s":"“四个自信”包括（）","o":["道路自信","理论自信","制度自信","文化自信"],"a":[0,1,2,3]},
+    {"s":"对党员的纪律处分种类包括（）","o":["警告、严重警告","撤销党内职务","留党察看","开除党籍"],"a":[0,1,2,3]},
+    {"s":"新质生产力的特征包括（）","o":["高科技","高效能","高质量","高消耗"],"a":[0,1,2]},
+    {"s":"全面从严治党要求包括（）","o":["思想建党和制度治党同向发力","严明党的纪律","加强党的领导","脱离群众"],"a":[0,1,2]},
+    {"s":"树立和践行正确政绩观要求（）","o":["坚持以人民为中心","为民造福是最大政绩","兼顾显绩与潜绩","只追求GDP增速"],"a":[0,1,2]},
+    {"s":"中央八项规定精神包括（）","o":["改进调查研究","精简会议活动","精简文件简报","厉行勤俭节约"],"a":[0,1,2,3]},
+    {"s":"发展党员工作方针包括（）","o":["控制总量","优化结构","提高质量","发挥作用"],"a":[0,1,2,3]}
+  ],
+  "judge": [
+    {"s":"预备党员的权利与义务和正式党员完全一样。","a":false,"n":"义务同正式党员一样；权利除没有表决权、选举权和被选举权外，同正式党员一样。"},
+    {"s":"端正入党动机是争取入党首要问题。","a":true},
+    {"s":"树立和践行正确政绩观，起决定性作用是制度建设。","a":false,"n":"起决定性作用的是党性。"},
+    {"s":"“为民造福是最大政绩”，政绩只看看得见、马上见效的项目。","a":false,"n":"要兼顾显绩和潜绩，多打基础、利长远。"},
+    {"s":"发展经济着力点放在虚拟经济，优先发展互联网经济。","a":false,"n":"着力点放在实体经济。"},
+    {"s":"留党察看处分最长不超过两年。","a":true},
+    {"s":"五四运动拉开中国新民主主义革命帷幕。","a":true},
+    {"s":"凡是正式党员3人以上，应当成立党的基层组织。","a":true},
+    {"s":"政绩观偏差只发生在领导干部身上，普通党员不需要树立正确政绩观。","a":false,"n":"普通党员同样要树立正确政绩观，立足岗位创造实绩。"},
+    {"s":"高质量发展只是经济发达地区的要求。","a":false,"n":"高质量发展是所有地区都必须长期坚持的总要求。"},
+    {"s":"党的最高理想和最终目标是实现中华民族伟大复兴。","a":false,"n":"党的最高理想和最终目标是实现共产主义。"},
+    {"s":"实事求是是党的思想路线的核心。","a":true},
+    {"s":"预备党员没有表决权、选举权和被选举权。","a":true},
+    {"s":"党员连续三个月不交纳党费，就被认为是自行脱党。","a":false,"n":"连续六个月不交纳党费，才被认为是自行脱党。"},
+    {"s":"开除党籍是党内最高的纪律处分。","a":true},
+    {"s":"党的基层组织是党全部工作和战斗力的基础。","a":true},
+    {"s":"“十五五”时期是基本实现社会主义现代化夯实基础、全面发力的关键时期。","a":true},
+    {"s":"新质生产力以创新为主导，要统筹教育强国、科技强国、人才强国建设。","a":true},
+    {"s":"正确政绩观只要求领导干部树立，普通党员不需要。","a":false,"n":"普通党员同样要树立正确政绩观，立足岗位创造实绩。"},
+    {"s":"中央八项规定是党的十八大审议通过的。","a":false,"n":"中央八项规定是2012年12月4日中共中央政治局会议审议通过的。"}
+  ],
+  "fill": [
+    {"s":"党章规定，发展党员，必须把____放在首位，经过党的支部，坚持个别吸收的原则。","a":["政治标准"]},
+    {"s":"党内最高的纪律处分是____。","a":["开除党籍"]},
+    {"s":"入党积极分子至少经过党组织____时间的培养、教育和考察，才能定为发展对象。","a":["一年","1年","一年的"]},
+    {"s":"预备期满后，必须由____向组织关系所在党组织提出转正申请。","a":["预备党员本人","本人"],"f":"预备期满后，必须由预备党员本人向组织关系所在党组织提出转正申请。"},
+    {"s":"党员的党龄，从____之日算起。","a":["预备期满转为正式党员","预备期满转正","转正"]},
+    {"s":"申请入党，要填写入党志愿书，要有____名正式党员作介绍人，经过支部大会通过和上级党组织批准，并且经过预备期考察，才能成为正式党员。","a":["2","二","两","两名","2名","二名"]},
+    {"s":"党的根本组织原则是____。","a":["民主集中制"]},
+    {"s":"我们党的最大政治优势是____，党执政后的最大危险是脱离群众。","a":["密切联系群众"]},
+    {"s":"党的根本宗旨是____。","a":["全心全意为人民服务"]},
+    {"s":"党员如果没有正当理由，连续____不参加党的组织生活，或不交纳党费，或不做党所分配的工作，就被认为是自行脱党。","a":["六个月","6个月"]},
+    {"s":"预备党员的预备期为____，从支部大会通过他为预备党员之日算起。","a":["一年","1年"]},
+    {"s":"中国共产党人的初心和使命是：____。","a":["为中国人民谋幸福、为中华民族谋复兴"],"long":true},
+    {"s":"树立和践行正确政绩观，起决定性作用的是____。","a":["党性"]},
+    {"s":"树立和践行正确政绩观学习教育总要求是：____。","a":["立党为公、为民造福、科学决策、真抓实干"],"long":true},
+    {"s":"正确政绩观要处理好显绩与潜绩关系，既要做显功，也要做潜功，要有____的精神境界和功成必定有我的历史担当。","a":["功成不必在我"]},
+    {"s":"全面从严治党核心是____。","a":["加强党的领导"]},
+    {"s":"党的最高理想和最终目标是____。","a":["实现共产主义"]},
+    {"s":"党的思想路线是____。","a":["一切从实际出发，理论联系实际，实事求是，在实践中检验真理和发展真理"],"long":true},
+    {"s":"党的群众路线是____。","a":["一切为了群众，一切依靠群众，从群众中来，到群众中去"],"long":true},
+    {"s":"党的纪律处分种类包括____。","a":["警告、严重警告、撤销党内职务、留党察看、开除党籍"],"long":true},
+    {"s":"预备党员的义务同正式党员一样；权利除了没有____外，同正式党员一样。","a":["表决权、选举权和被选举权"],"long":true},
+    {"s":"中国特色社会主义最本质的特征是____。","a":["中国共产党领导"]},
+    {"s":"中国特色社会主义制度的最大优势是____。","a":["中国共产党领导"]},
+    {"s":"“四个意识”是____。","a":["政治意识、大局意识、核心意识、看齐意识"],"long":true},
+    {"s":"“四个自信”是____。","a":["道路自信、理论自信、制度自信、文化自信"],"long":true},
+    {"s":"“两个维护”是____。","a":["坚决维护习近平总书记党中央的核心、全党的核心地位，坚决维护党中央权威和集中统一领导"],"long":true},
+    {"s":"党的基层组织是党在社会基层组织中的____，是党的全部工作和战斗力的基础。","a":["战斗堡垒"]},
+    {"s":"发展党员工作方针是____。","a":["控制总量、优化结构、提高质量、发挥作用"],"long":true},
+    {"s":"党的二十届四中全会审议通过____。","a":["《中共中央关于制定国民经济和社会发展第十五个五年规划的建议》"],"long":true},
+    {"s":"“十五五”时期是基本实现社会主义现代化____的关键时期。","a":["夯实基础、全面发力"]}
+  ],
+  "short": [
+    {"s":"中国共产党的性质","a":"中国共产党是中国工人阶级的先锋队，同时是中国人民和中华民族的先锋队，是中国特色社会主义事业的领导核心，代表中国先进生产力的发展要求，代表中国先进文化的前进方向，代表中国最广大人民的根本利益。党的最高理想和最终目标是实现共产主义。"},
+    {"s":"入党誓词","a":"我志愿加入中国共产党，拥护党的纲领，遵守党的章程，履行党员义务，执行党的决定，严守党的纪律，保守党的秘密，对党忠诚，积极工作，为共产主义奋斗终身，随时准备为党和人民牺牲一切，永不叛党。"},
+    {"s":"党的行动指南","a":"中国共产党以马克思列宁主义、毛泽东思想、邓小平理论、“三个代表”重要思想、科学发展观、习近平新时代中国特色社会主义思想作为自己的行动指南。"},
+    {"s":"党的二十大主题","a":"高举中国特色社会主义伟大旗帜，全面贯彻习近平新时代中国特色社会主义思想，弘扬伟大建党精神，自信自强、守正创新，踔厉奋发、勇毅前行，为全面建设社会主义现代化国家、全面推进中华民族伟大复兴而团结奋斗。"},
+    {"s":"简述党的二十届四中全会重大意义和主要成果","a":"（1）党的二十届四中全会在即将完成“十四五”、迈向“十五五”关键节点召开，是推进中国式现代化的重要会议。（2）最重要成果是审议通过《中共中央关于制定国民经济和社会发展第十五个五年规划的建议》，是指导“十五五”时期经济社会发展的纲领性文件。（3）明确“十五五”时期是基本实现社会主义现代化夯实基础、全面发力的关键时期，部署发展新质生产力、建设现代化产业体系、构建新发展格局、高水平对外开放等重大任务，为今后五年发展指明方向。"}
+  ]
+}
+</script>
+
+<script id="app-script">
+(function(){
+'use strict';
+
+/* ============ 基础工具 ============ */
+var app=document.getElementById('app');
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+var LT=['A','B','C','D','E','F'];
+var PUNC=/[\s，。、；：""''「」《》（）()【】,.!?！？;:"'\-—_·]/g;
+function norm(s){return String(s==null?'':s).replace(PUNC,'');}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function fmtLeft(){
+  var ex=ui.ex;if(!ex)return '0:00';
+  var left=Math.max(0,Math.round((ex.endsAt-Date.now())/1000));
+  var m=Math.floor(left/60),s=left%60;
+  return m+':'+(s<10?'0':'')+s;
+}
+function fmtDur(sec){var m=Math.floor(sec/60),s=sec%60;return m+' 分 '+(s<10?'0':'')+s+' 秒';}
+var toastT=null;
+function toast(msg){
+  var t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t);}
+  t.textContent=msg;t.classList.add('on');
+  clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on');},1700);
+}
+
+/* ============ 题库 ============ */
+var raw=JSON.parse(document.getElementById('quiz-data').textContent);
+var TN={single:'单选题',multi:'多选题',judge:'判断题',fill:'填空题'};
+function sortNum(a,b){return a-b;}
+var banks={
+  single:raw.single.map(function(x,i){return {id:'S'+(i+1),type:'single',stem:x.s,opts:x.o,ans:x.a.slice().sort(sortNum),note:x.n||''};}),
+  multi:raw.multi.map(function(x,i){return {id:'M'+(i+1),type:'multi',stem:x.s,opts:x.o,ans:x.a.slice().sort(sortNum),note:x.n||''};}),
+  judge:raw.judge.map(function(x,i){return {id:'J'+(i+1),type:'judge',stem:x.s,opts:['正确','错误'],ans:[x.a?0:1],note:x.n||''};}),
+  fill:raw.fill.map(function(x,i){return {id:'F'+(i+1),type:'fill',stem:x.s,ans:x.a,full:x.f||x.s.replace('____',x.a[0]),long:!!x.long};})
+};
+var TYPES=['single','multi','judge','fill'];
+var ALL={};
+TYPES.forEach(function(t){banks[t].forEach(function(q){ALL[q.id]=q;});});
+var TOTAL=TYPES.reduce(function(n,t){return n+banks[t].length;},0);
+var PRESETS={
+  quick:{name:'快速测验',min:15,c:{single:7,multi:7,judge:6}},
+  std:{name:'标准测验',min:30,c:{single:14,multi:13,judge:13}},
+  full:{name:'全真模拟',min:60,c:{single:20,multi:20,judge:20}}
+};
+
+function ansText(q){
+  if(q.type==='fill')return q.ans[0];
+  if(q.type==='judge')return q.ans[0]===0?'正确（√）':'错误（×）';
+  return q.ans.map(function(i){return LT[i];}).join('');
+}
+function labelOf(q,i){return q.type==='judge'?(i===0?'正确':'错误'):LT[i];}
+function pickedText(q,picked){
+  if(!picked||!picked.length)return '';
+  if(q.type==='judge')return labelOf(q,picked[0]);
+  return picked.map(function(i){return LT[i];}).join('');
+}
+function isRight(q,picked){
+  if(!picked||!picked.length)return false;
+  if(q.type==='multi'){
+    if(picked.length!==q.ans.length)return false;
+    return q.ans.every(function(a){return picked.indexOf(a)>=0;});
+  }
+  return picked[0]===q.ans[0];
+}
+function fillOk(q,input){
+  var v=norm(input);if(!v)return false;
+  return q.ans.some(function(a){
+    var A=norm(a);
+    if(v===A)return true;
+    if(v.length>=2&&A.indexOf(v)>=0)return true;
+    if(A.length>=2&&v.indexOf(A)>=0)return true;
+    return false;
+  });
+}
+
+/* ============ 本地记录 ============ */
+var KEY='dxd_quiz_v1';
+var store={stats:{done:0,right:0},wrong:{},history:[]};
+try{
+  var saved=JSON.parse(localStorage.getItem(KEY)||'null');
+  if(saved&&typeof saved==='object'){
+    store.stats=Object.assign({done:0,right:0},saved.stats||{});
+    store.wrong=saved.wrong||{};
+    store.history=saved.history||[];
+  }
+}catch(e){}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+function wrongIds(){return Object.keys(store.wrong).filter(function(id){return !!ALL[id];});}
+function addWrong(id){if(!ALL[id])return;var w=store.wrong[id]||{n:0,t:0};w.n++;w.t=Date.now();store.wrong[id]=w;persist();}
+function delWrong(id){if(store.wrong[id]){delete store.wrong[id];persist();}}
+function record(q,ok){
+  store.stats.done++;
+  if(ok){store.stats.right++;if(ui.p&&ui.p.retry)delWrong(q.id);}
+  else addWrong(q.id);
+  persist();
+}
+
+/* ============ 界面状态 ============ */
+var ui={
+  view:'home',ptype:'all',porder:'seq',phint:true,preset:'std',
+  p:null,pfin:null,ex:null,res:null,recite:'fill',onlyWrong:false,opened:{}
+};
+var timerId=null;
+
+/* ============ 视图 ============ */
+function viewHome(){
+  var st=store.stats;
+  var rate=st.done?Math.round(st.right/st.done*100):0;
+  var nw=wrongIds().length;
+  var counts=TYPES.map(function(t){return TN[t].replace('题','')+' '+banks[t].length;}).join(' · ');
+  return '<div class="hd"><h1>发展对象考试刷题</h1></div>'
+  +'<div class="wrap nobar">'
+  +'<div class="card hero">'
+  +'<div class="t">题库已就绪 · 共 '+TOTAL+' 题</div>'
+  +'<div class="s">'+counts+' · 简答题 '+raw.short.length+' 题</div>'
+  +'<div class="st">本机累计练习 <b>'+st.done+'</b> 题 · 正确率 <b>'+rate+'%</b>'+(store.history.length?' · 已考 '+store.history.length+' 次':'')+'</div>'
+  +'</div>'
+  +'<button class="mode" data-act="go" data-v="practice"><span class="mi">✍️</span><span class="mt">练习模式<em>逐题作答，答完立刻看正确答案和解析</em></span><span class="arrow">›</span></button>'
+  +'<button class="mode" data-act="go" data-v="exam"><span class="mi">⏱️</span><span class="mt">考试模式<em>限时答题、交卷自动评分，可看逐题解析</em></span><span class="arrow">›</span></button>'
+  +'<button class="mode" data-act="go" data-v="recite"><span class="mi">📖</span><span class="mt">速记背诵<em>填空题原文＋简答题答案，考前一遍过</em></span><span class="arrow">›</span></button>'
+  +'<div class="row2">'
+  +'<button class="btn ghost" data-act="go" data-v="wrong">错题本（'+nw+'）</button>'
+  +'<button class="btn ghost" data-act="reset">清除记录</button>'
+  +'</div>'
+  +'<p class="tip">题库来源：《发展对象考试复习提纲（下发版）》，共 '+TOTAL+' 道客观题。单选题第 17 题答案已由 C 改为 D。<br>把本页面收藏到手机桌面，随时可以刷题。</p>'
+  +'</div>';
+}
+
+function chip(g,v,label){
+  return '<button class="chip '+(ui[g]===v?'on':'')+'" data-act="chip" data-g="'+g+'" data-v="'+v+'">'+label+'</button>';
+}
+function viewPracticeSetup(){
+  var nw=wrongIds().length;
+  return '<div class="hd"><button class="back" data-act="go" data-v="home">‹</button><h1>练习模式</h1></div>'
+  +'<div class="wrap nobar">'
+  +'<div class="card">'
+  +'<div class="lbl">选择题型</div>'
+  +'<div class="chips">'+chip('ptype','all','全部 '+TOTAL+' 题')+TYPES.map(function(t){return chip('ptype',t,TN[t]+' '+banks[t].length);}).join('')+'</div>'
+  +'<div class="lbl">出题顺序</div>'
+  +'<div class="chips">'+chip('porder','seq','按顺序')+chip('porder','rand','随机打乱')+'</div>'
+  +'<label class="switch"><input type="checkbox" id="hintSwitch"'+(ui.phint?' checked':'')+'> 答题后立即显示答案与解析（答案提示）</label>'
+  +'</div>'
+  +'<button class="btn primary block" data-act="pstart">开始练习</button>'
+  +'<button class="btn ghost block" data-act="prestartwrong"'+(nw?'':' disabled')+'>只练错题（'+nw+' 题）</button>'
+  +'<p class="tip">单选题点击选项即判分；多选题选好后点“确定作答”；填空题输入关键词即可，答不出可点“显示答案”。</p>'
+  +'</div>';
+}
+
+function pst(q){
+  var p=ui.p;
+  if(!p.st[q.id])p.st[q.id]={picked:[],graded:false,correct:false,revealed:false,self:null,inputRaw:''};
+  return p.st[q.id];
+}
+function optsHtml(q,st){
+  var show=st.graded||st.revealed;
+  return q.opts.map(function(o,i){
+    var cls='opt',has=st.picked.indexOf(i)>=0;
+    if(show){
+      if(q.ans.indexOf(i)>=0)cls+=' ok';
+      else if(has)cls+=' bad';
+    }else if(has)cls+=' sel';
+    var k=q.type==='judge'?(i===0?'√':'×'):LT[i];
+    return '<div class="'+cls+'" data-act="pick" data-i="'+i+'"><span class="k">'+k+'</span><span class="t">'+esc(o)+'</span></div>';
+  }).join('');
+}
+function fbBox(q,st){
+  var ok=!!(st.graded&&st.correct);
+  var cls=st.graded?(ok?'ok':'bad'):'info';
+  var title=st.graded?(ok?'✅ 答对了':'❌ 答错了'):'💡 答案提示';
+  var rows='<div class="fr">正确答案：<b>'+esc(ansText(q))+'</b></div>';
+  if(st.graded){
+    if(q.type==='fill'&&st.inputRaw)rows+='<div class="fr">你的答案：'+esc(st.inputRaw)+'</div>';
+    if(q.type!=='fill'&&st.picked.length)rows+='<div class="fr">你的答案：'+esc(pickedText(q,st.picked))+'</div>';
+  }
+  if(q.note)rows+='<div class="fr">解析：'+esc(q.note)+'</div>';
+  if(q.type==='fill'&&q.full&&!ok&&q.full!==q.stem)rows+='<div class="fr">原句：'+esc(q.full)+'</div>';
+  return '<div class="fb '+cls+'"><div class="ft">'+title+'</div>'+rows+'</div>';
+}
+function viewPractice(){
+  var p=ui.p,q=p.list[p.i],st=pst(q);
+  var pct=Math.round((p.i+1)/p.list.length*100);
+  var show=st.graded||st.revealed;
+  var mid='';
+  if(q.type==='fill'){
+    if(q.long){
+      mid='<div class="hintbox">答案较长，先在脑中回忆，再点“显示答案”对照自评。</div>';
+      if(show){
+        mid+=fbBox(q,st);
+        if(st.self===null)mid+='<div class="row2"><button class="btn ghost sm" data-act="pself" data-v="0">没记住</button><button class="btn primary sm" data-act="pself" data-v="1">记住了</button></div>';
+      }
+    }else{
+      mid='<input class="fillin '+(st.graded?(st.correct?'ok':'bad'):'')+'" id="fillIn" type="text" placeholder="输入答案后点“提交”" value="'+esc(p.input||'')+'"'+(show?' readonly':'')+' autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">';
+      if(show)mid+=fbBox(q,st);
+      else mid+='<div class="row2" style="margin-top:12px"><button class="btn ghost sm" data-act="fhint">提示</button><button class="btn primary sm" data-act="fsubmit">提交答案</button></div>';
+    }
+  }else{
+    mid=optsHtml(q,st);
+    if(show)mid+=fbBox(q,st);
+    else if(q.type==='multi'&&ui.phint)mid+='<div class="row2" style="margin-top:12px"><button class="btn primary sm" data-act="fsubmit">确定作答</button></div>';
+  }
+  var reLabel=st.graded?'已作答':(st.revealed?'隐藏答案':'显示答案');
+  return '<div class="hd"><button class="back" data-act="pexit">‹</button><h1>练习 · '+TN[q.type]+'</h1><span class="hdr">'+(p.i+1)+'/'+p.list.length+'</span></div>'
+  +'<div class="progress"><i style="width:'+pct+'%"></i></div>'
+  +'<div class="wrap">'
+  +'<div class="card">'
+  +'<div class="qhead"><span class="tag">'+TN[q.type]+'</span><span class="qidx">第 '+(p.i+1)+' 题 / 共 '+p.list.length+' 题'+(ui.phint?'':' · 答案提示已关闭')+(p.retry?' · 错题重做':'')+'</span></div>'
+  +'<div class="stem">'+esc(q.stem)+'</div>'
+  +mid
+  +'</div>'
+  +'</div>'
+  +'<div class="barwrap">'
+  +'<button class="btn ghost" data-act="pprev"'+(p.i===0?' disabled':'')+'>上一题</button>'
+  +'<button class="btn ghost" data-act="preveal"'+(st.graded?' disabled':'')+'>'+reLabel+'</button>'
+  +'<button class="btn primary" data-act="pnext">'+(p.i===p.list.length-1?'完成练习':'下一题')+'</button>'
+  +'</div>';
+}
+
+function viewPfinish(){
+  var f=ui.pfin;
+  var rate=f.ans?Math.round(f.right/f.ans*100):0;
+  return '<div class="hd"><h1>练习完成</h1></div>'
+  +'<div class="wrap nobar">'
+  +'<div class="card scorebox">'
+  +'<div class="num">'+rate+'<small>%</small></div>'
+  +'<div class="cap">本轮作答 '+f.ans+' / '+f.n+' 题，答对 '+f.right+' 题'+(f.retry?'（错题重做）':'')+'</div>'
+  +'</div>'
+  +'<button class="btn primary block" data-act="prestart">再来一轮</button>'
+  +'<button class="btn ghost block" data-act="go" data-v="wrong">查看错题本（'+wrongIds().length+'）</button>'
+  +'<button class="btn ghost block" data-act="home">返回首页</button>'
+  +'</div>';
+}
+
+function viewExamSetup(){
+  var cards=Object.keys(PRESETS).map(function(k){
+    var p=PRESETS[k],n=p.c.single+p.c.multi+p.c.judge;
+    var on=ui.preset===k;
+    return '<button class="mode" data-act="chip" data-g="preset" data-v="'+k+'" style="'+(on?'border-color:#a81f1a;background:#fdf5f4':'')+'">'
+    +'<span class="mi">'+(k==='full'?'🏆':(k==='std'?'📝':'⚡'))+'</span>'
+    +'<span class="mt">'+p.name+'<em>'+n+' 题（单选 '+p.c.single+' · 多选 '+p.c.multi+' · 判断 '+p.c.judge+'）· '+p.min+' 分钟</em></span>'
+    +'<span class="arrow">'+(on?'✓':'›')+'</span></button>';
+  }).join('');
+  var last=store.history.length?store.history[0]:null;
+  return '<div class="hd"><button class="back" data-act="go" data-v="home">‹</button><h1>考试模式</h1></div>'
+  +'<div class="wrap nobar">'
+  +'<div class="card"><div class="lbl">选择试卷</div>'+cards+'</div>'
+  +(last?'<div class="card"><div class="lbl">上次成绩</div><div class="kv"><span>得分</span><b>'+last.score+' 分（答对 '+last.right+'/'+last.total+'）</b></div><div class="kv"><span>用时</span><b>'+fmtDur(last.used)+'</b></div></div>':'')
+  +'<button class="btn primary block" data-act="estart">开始考试</button>'
+  +'<p class="tip">考试中不显示答案，可以来回改题。多选题必须全部选对才得分，交卷后自动评分并给出逐题解析。</p>'
+  +'</div>';
+}
+
+function buildExam(preset){
+  var cfg=PRESETS[preset].c,list=[];
+  ['single','multi','judge'].forEach(function(t){
+    list=list.concat(shuffle(banks[t]).slice(0,cfg[t]));
+  });
+  return list;
+}
+function viewExam(){
+  var ex=ui.ex,q=ex.list[ex.i],pk=ex.picked[q.id]||[];
+  var done=Object.keys(ex.picked).filter(function(k){return ex.picked[k]&&ex.picked[k].length;}).length;
+  var mid;
+  if(q.type==='judge'||q.type==='single'||q.type==='multi'){
+    mid=q.opts.map(function(o,i){
+      var sel=pk.indexOf(i)>=0;
+      var k=q.type==='judge'?(i===0?'√':'×'):LT[i];
+      return '<div class="opt'+(sel?' sel':'')+'" data-act="epick" data-i="'+i+'"><span class="k">'+k+'</span><span class="t">'+esc(o)+'</span></div>';
+    }).join('');
+  }
+  var html='<div class="hd"><button class="back" data-act="exitexam">‹</button><h1>考试中 · '+TN[q.type]+'</h1><button class="hdbtn" data-act="submit">交卷</button></div>'
+  +'<div class="subbar"><span>剩余时间 <b id="timer">'+fmtLeft()+'</b></span><span>已答 <b>'+done+'</b>/'+ex.list.length+'</span></div>'
+  +'<div class="wrap">'
+  +'<div class="card">'
+  +'<div class="qhead"><span class="tag">'+TN[q.type]+'</span><span class="qidx">第 '+(ex.i+1)+' 题 / 共 '+ex.list.length+' 题</span></div>'
+  +'<div class="stem">'+esc(q.stem)+'</div>'
+  +mid
+  +(q.type==='multi'?'<div class="tip">多选题：选好后可直接切下一题，也可以回来修改。</div>':'')
+  +'</div></div>'
+  +'<div class="barwrap">'
+  +'<button class="btn ghost" data-act="eprev"'+(ex.i===0?' disabled':'')+'>上一题</button>'
+  +'<button class="btn ghost" data-act="esheet">答题卡</button>'
+  +'<button class="btn primary" data-act="enext"'+(ex.i===ex.list.length-1?' disabled':'')+'>下一题</button>'
+  +'</div>';
+  if(ex.sheet){
+    var nums=ex.list.map(function(item,idx){
+      var d=(ex.picked[item.id]&&ex.picked[item.id].length)?' done':'';
+      var c=idx===ex.i?' cur':'';
+      return '<button class="gnum'+d+c+'" data-act="ejump" data-i="'+idx+'">'+(idx+1)+'</button>';
+    }).join('');
+    html+='<div class="overlay" data-act="esheetclose"><div class="sheetbox">'
+    +'<h3>答题卡（已答 '+done+' / '+ex.list.length+'）</h3>'
+    +'<div class="grid">'+nums+'</div>'
+    +'<div class="legend">灰色＝已作答 · 红框＝当前题</div>'
+    +'<div class="row2" style="margin-top:16px"><button class="btn ghost" data-act="esheetclose">继续答题</button><button class="btn primary" data-act="submit">交卷</button></div>'
+    +'</div></div>';
+  }
+  return html;
+}
+
+function viewResult(){
+  var r=ui.res;
+  var list=r.onlyWrong?r.per.filter(function(x){return !x.ok;}):r.per;
+  var rows=list.map(function(x,idx){
+    var q=x.q,my=pickedText(q,x.p);
+    return '<div class="rev">'
+    +'<div class="stem">'+(idx+1)+'. '+esc(q.stem)+' <span class="tag g">'+TN[q.type]+'</span></div>'
+    +'<div class="line">你的答案：'+(x.ok?'<b>'+esc(my)+'</b>':'<u>'+esc(my||'未作答')+'</u>')+'</div>'
+    +'<div class="line">正确答案：<b>'+esc(ansText(q))+'</b></div>'
+    +(q.note?'<div class="note">解析：'+esc(q.note)+'</div>':'')
+    +'</div>';
+  }).join('');
+  return '<div class="hd"><button class="back" data-act="home">‹</button><h1>考试成绩</h1></div>'
+  +'<div class="wrap nobar">'
+  +'<div class="card scorebox">'
+  +'<div class="num">'+r.score+'<small>分</small></div>'
+  +'<div class="cap">答对 '+r.right+' / '+r.total+' 题 · 用时 '+fmtDur(r.used)+'</div>'
+  +'</div>'
+  +'<button class="btn primary block" data-act="again">再考一次（同规格新卷）</button>'
+  +'<div class="row2"><button class="btn ghost" data-act="onlywrong">'+(r.onlyWrong?'查看全部题目':'只看错题')+'</button><button class="btn ghost" data-act="home">返回首页</button></div>'
+  +'<div class="card" style="margin-top:12px;padding:4px 16px">'+rows+'</div>'
+  +'</div>';
+}
+
+function viewRecite(){
+  var isFill=ui.recite==='fill';
+  var body='';
+  if(isFill){
+    body=banks.fill.map(function(q,i){
+      return '<div class="recite"><span class="n">'+(i+1)+'</span>'+esc(q.stem).replace('____','<b>'+esc(q.ans[0])+'</b>')+'</div>';
+    }).join('');
+  }else{
+    body=raw.short.map(function(x,i){
+      var open=!!ui.opened['sh'+i];
+      return '<div class="recite"><span class="n">'+(i+1)+'</span>'+esc(x.s)
+      +'<button class="chip '+(open?'on':'')+'" style="margin-left:6px" data-act="shortshow" data-i="'+i+'">'+(open?'收起答案':'显示答案')+'</button>'
+      +(open?'<div class="shortb">'+esc(x.a)+'</div>':'')+'</div>';
+    }).join('');
+  }
+  return '<div class="hd"><button class="back" data-act="go" data-v="home">‹</button><h1>速记背诵</h1></div>'
+  +'<div class="card" style="margin:12px 14px 0;display:flex;gap:10px;padding:12px">'
+  +'<button class="btn '+(isFill?'primary':'ghost')+'" data-act="rectab" data-v="fill">填空题原文</button>'
+  +'<button class="btn '+(isFill?'ghost':'primary')+'" data-act="rectab" data-v="short">简答题答案</button>'
+  +'</div>'
+  +'<div class="wrap nobar"><div class="card">'+(body||'<div class="empty">暂无内容</div>')+'</div>'
+  +'<p class="tip">'+(isFill?'红色加粗即为填空处应背的关键词。':'简答题按提纲原文背诵，考试时写要点即可。')+'</p>'
+  +'</div>';
+}
+
+function viewWrong(){
+  var ids=wrongIds();
+  var body=ids.map(function(id){
+    var q=ALL[id];
+    return '<div class="rev" style="'+(q.type==='fill'?'':'')+'">'
+    +'<div class="stem" data-act="wopen" data-id="'+id+'"><span class="tag g">'+TN[q.type]+'</span> '+esc(q.stem)+'</div>'
+    +'<div class="line">正确答案：<b>'+esc(ansText(q))+'</b></div>'
+    +(q.note?'<div class="note">解析：'+esc(q.note)+'</div>':'')
+    +(q.type==='fill'&&q.full!==q.stem?'<div class="note">原句：'+esc(q.full)+'</div>':'')
+    +'<div class="row2" style="margin-top:10px"><button class="xbtn" data-act="delwrong" data-id="'+id+'">移除</button></div>'
+    +'</div>';
+  }).join('');
+  return '<div class="hd"><button class="back" data-act="go" data-v="home">‹</button><h1>错题本（'+ids.length+'）</h1></div>'
+  +'<div class="wrap nobar">'
+  +(ids.length?'<button class="btn primary block" data-act="prestartwrong">重做错题（'+ids.length+' 题）</button>':'')
+  +'<div class="card" style="padding:4px 16px">'+(body||'<div class="empty">还没有错题<br>练习和考试中答错的题目会自动收进来</div>')+'</div>'
+  +(ids.length?'<button class="btn ghost block" data-act="clearwrong">清空错题本</button>':'')
+  +'</div>';
+}
+
+/* ============ 渲染与路由 ============ */
+function render(){
+  var html='';
+  switch(ui.view){
+    case 'home':html=viewHome();break;
+    case 'practice':html=ui.p?viewPractice():viewPracticeSetup();break;
+    case 'pfinish':html=viewPfinish();break;
+    case 'exam':html=ui.ex?viewExam():viewExamSetup();break;
+    case 'result':html=viewResult();break;
+    case 'recite':html=viewRecite();break;
+    case 'wrong':html=viewWrong();break;
+    default:html=viewHome();
+  }
+  app.innerHTML=html;
+}
+function nav(v){ui.view=v;window.scrollTo(0,0);render();}
+function top(){window.scrollTo(0,0);}
+
+/* ============ 练习逻辑 ============ */
+function startPractice(retry){
+  var list;
+  if(retry){
+    list=wrongIds().map(function(id){return ALL[id];});
+  }else{
+    list=ui.ptype==='all'?TYPES.reduce(function(a,t){return a.concat(banks[t]);},[]):banks[ui.ptype].slice();
+    if(ui.porder==='rand')list=shuffle(list);
+  }
+  if(!list.length){toast('没有可练习的题目');return;}
+  ui.p={list:list,retry:!!retry,i:0,st:{},input:''};
+  nav('practice');
+}
+function finishPractice(){
+  var p=ui.p,ans=0,right=0;
+  p.list.forEach(function(q){var st=p.st[q.id];if(st&&st.graded){ans++;if(st.correct)right++;}});
+  ui.pfin={n:p.list.length,ans:ans,right:right,retry:p.retry};
+  ui.p=null;
+  nav('pfinish');
+}
+
+/* ============ 考试逻辑 ============ */
+function startExam(preset){
+  var list=buildExam(preset);
+  ui.ex={
+    list:list,i:0,picked:{},sheet:false,preset:preset,min:PRESETS[preset].min,
+    start:Date.now(),endsAt:Date.now()+PRESETS[preset].min*60000
+  };
+  nav('exam');
+  clearInterval(timerId);
+  timerId=setInterval(tickTimer,500);
+}
+function tickTimer(){
+  var ex=ui.ex;
+  if(!ex){clearInterval(timerId);return;}
+  var el=document.getElementById('timer');
+  if(el)el.textContent=fmtLeft();
+  if(ex.endsAt-Date.now()<=0){clearInterval(timerId);submitExam(true);}
+}
+function submitExam(auto){
+  var ex=ui.ex;
+  if(!ex)return;
+  var unanswered=ex.list.filter(function(q){return !(ex.picked[q.id]&&ex.picked[q.id].length);}).length;
+  if(!auto){
+    if(!confirm(unanswered?'还有 '+unanswered+' 题未作答，确定交卷吗？':'确定交卷吗？'))return;
+  }
+  clearInterval(timerId);
+  var right=0,per=[];
+  ex.list.forEach(function(q){
+    var p=ex.picked[q.id]||[],ok=isRight(q,p);
+    if(ok)right++;else addWrong(q.id);
+    per.push({q:q,p:p,ok:ok});
+  });
+  var used=Math.round((Date.now()-ex.start)/1000);
+  if(used>ex.min*60)used=ex.min*60;
+  var score=Math.round(right/ex.list.length*100);
+  store.history.unshift({t:Date.now(),score:score,total:ex.list.length,right:right,used:used});
+  store.history=store.history.slice(0,20);
+  persist();
+  ui.res={score:score,right:right,total:ex.list.length,used:used,per:per,onlyWrong:false,preset:ex.preset};
+  ui.ex=null;
+  nav('result');
+  toast(auto?'时间到，已自动交卷':'已交卷，成绩已生成');
+}
+function exitExam(){
+  if(!ui.ex)return;
+  if(!confirm('退出后本次考试作答不保存，确定退出吗？'))return;
+  clearInterval(timerId);
+  ui.ex=null;
+  nav('exam');
+}
+
+/* ============ 交互 ============ */
+app.addEventListener('click',function(e){
+  var el=e.target.closest?e.target.closest('[data-act]'):null;
+  if(!el)return;
+  var act=el.getAttribute('data-act');
+  if(act==='esheetclose'){
+    if(el.classList.contains('overlay')&&e.target.closest('.sheetbox'))return;
+    ui.ex.sheet=false;render();return;
+  }
+  switch(act){
+    case 'go':ui.p=null;ui.ex=null;clearInterval(timerId);nav(el.getAttribute('data-v'));break;
+    case 'home':ui.p=null;ui.ex=null;ui.res=null;clearInterval(timerId);nav('home');break;
+    case 'chip':ui[el.getAttribute('data-g')]=el.getAttribute('data-v');render();break;
+    case 'pstart':startPractice(false);break;
+    case 'prestartwrong':startPractice(true);break;
+    case 'prestart':startPractice(ui.pfin?ui.pfin.retry:false);break;
+    case 'pnext':{
+      var p=ui.p;
+      if(p.i<p.list.length-1){p.i++;p.input='';top();render();}
+      else finishPractice();
+      break;
+    }
+    case 'pprev':{var p2=ui.p;if(p2.i>0){p2.i--;p2.input='';top();render();}break;}
+    case 'preveal':{
+      var q=ui.p.list[ui.p.i],st=pst(q);
+      if(st.graded)break;
+      st.revealed=!st.revealed;render();break;
+    }
+    case 'pick':{
+      var qq=ui.p.list[ui.p.i],s1=pst(qq);
+      if(s1.graded||s1.revealed)break;
+      var i=parseInt(el.getAttribute('data-i'),10);
+      if(qq.type==='multi'){
+        s1.picked=s1.picked.indexOf(i)>=0?s1.picked.filter(function(x){return x!==i;}):s1.picked.concat([i]).sort(sortNum);
+      }else{
+        s1.picked=[i];
+        if(ui.phint){s1.correct=isRight(qq,s1.picked);s1.graded=true;record(qq,s1.correct);}
+      }
+      render();break;
+    }
+    case 'fsubmit':{
+      var q3=ui.p.list[ui.p.i],s3=pst(q3);
+      if(s3.graded)break;
+      if(q3.type==='fill'){
+        var inp=document.getElementById('fillIn');
+        var v=inp?inp.value:'';
+        if(!norm(v)){toast('先输入答案再提交');break;}
+        s3.inputRaw=v;s3.correct=fillOk(q3,v);s3.graded=true;record(q3,s3.correct);
+      }else{
+        if(!s3.picked.length){toast('请先选择答案');break;}
+        s3.correct=isRight(q3,s3.picked);s3.graded=true;record(q3,s3.correct);
+      }
+      render();break;
+    }
+    case 'fhint':{
+      var q4=ui.p.list[ui.p.i],a4=q4.ans[0];
+      toast('提示：共 '+norm(a4).length+' 个字，首字是「'+a4.charAt(0)+'」');
+      break;
+    }
+    case 'pself':{
+      var q5=ui.p.list[ui.p.i],s5=pst(q5);
+      if(s5.self!==null)break;
+      s5.self=el.getAttribute('data-v')==='1';
+      s5.graded=true;s5.correct=s5.self;record(q5,s5.self);
+      render();break;
+    }
+    case 'pexit':ui.p=null;nav('practice');break;
+    case 'estart':startExam(ui.preset);break;
+    case 'epick':{
+      var ex=ui.ex,q6=ex.list[ex.i],i6=parseInt(el.getAttribute('data-i'),10);
+      var cur=ex.picked[q6.id]||[];
+      if(q6.type==='multi'){
+        cur=cur.indexOf(i6)>=0?cur.filter(function(x){return x!==i6;}):cur.concat([i6]).sort(sortNum);
+      }else{
+        cur=[i6];
+      }
+      ex.picked[q6.id]=cur;
+      render();break;
+    }
+    case 'enext':if(ui.ex.i<ui.ex.list.length-1){ui.ex.i++;top();render();}break;
+    case 'eprev':if(ui.ex.i>0){ui.ex.i--;top();render();}break;
+    case 'esheet':ui.ex.sheet=true;render();break;
+    case 'ejump':ui.ex.i=parseInt(el.getAttribute('data-i'),10);ui.ex.sheet=false;top();render();break;
+    case 'submit':submitExam(false);break;
+    case 'exitexam':exitExam();break;
+    case 'again':startExam(ui.res.preset);break;
+    case 'onlywrong':ui.res.onlyWrong=!ui.res.onlyWrong;render();break;
+    case 'rectab':ui.recite=el.getAttribute('data-v');top();render();break;
+    case 'shortshow':{var k='sh'+el.getAttribute('data-i');ui.opened[k]=!ui.opened[k];render();break;}
+    case 'delwrong':delWrong(el.getAttribute('data-id'));render();break;
+    case 'clearwrong':if(confirm('确定清空错题本吗？')){store.wrong={};persist();render();}break;
+    case 'reset':if(confirm('确定清除本机全部练习记录、错题和成绩吗？')){store={stats:{done:0,right:0},wrong:{},history:[]};persist();render();}break;
+  }
+});
+app.addEventListener('input',function(e){
+  if(e.target&&e.target.id==='fillIn'&&ui.p)ui.p.input=e.target.value;
+});
+app.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&e.target&&e.target.id==='fillIn'){
+    e.preventDefault();
+    var b=app.querySelector('[data-act="fsubmit"]');
+    if(b)b.click();
+  }
+});
+document.addEventListener('change',function(e){
+  if(e.target&&e.target.id==='hintSwitch')ui.phint=e.target.checked;
+});
+
+render();
+})();
+</script>
+</body>
+</html>
